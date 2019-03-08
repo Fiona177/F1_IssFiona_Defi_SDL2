@@ -1,0 +1,77 @@
+program SDL2_Viewport;
+
+uses SDL2, SDL2_image, crt;
+
+var
+  i: integer;
+  sdlWindow1: PSDL_Window;
+  sdlRenderer: PSDL_Renderer;
+  sdlsurf: PSDL_Surface;
+  sdltext: PSDL_Texture;
+  sdlheli: TSDL_Rect;
+  sdlheli2: TSDL_Rect;
+  sorti: boolean;
+  sdlKeys: PUInt8;
+  sdlEvent: PSDL_Event;
+
+begin
+
+  sorti:= false;
+  //initilization of video subsystem
+  if SDL_Init(SDL_INIT_VIDEO) < 0 then Halt;
+
+  SDL_CreateWindowAndRenderer(1280, 720, SDL_WINDOW_SHOWN, @sdlWindow1, @sdlRenderer);
+  if (sdlWindow1 = nil) or (sdlRenderer = nil) then Halt;
+
+  //Création du rectangle avec image
+  sdltext := IMG_LoadTexture(sdlRenderer,'image/helicopter.png');
+  if sdltext = nil then Halt;
+
+  //Placement des rectangles
+  sdlheli.x := 0;
+  sdlheli.y := 0;
+  sdlheli.w := 128;
+  sdlheli.h := 55;
+
+  sdlheli2.x:= sdlEvent^.motion.x-(128 div 2);
+  sdlheli2.y:= sdlEvent^.motion.y-(55 div 2);
+  sdlheli2.w:= 128;
+  sdlheli2.h:= 55;
+
+  new(sdlEvent);
+
+  
+
+  //Boucle tant que la touche F1 n'est pas actionné le programme continu
+  while sorti=false do
+  begin
+
+
+
+    SDL_PumpEvents;
+    sdlKeys := SDL_GetKeyboardState(nil);
+    if sdlKeys[SDL_SCANCODE_F1]=1 then sorti:=true;
+
+    for i:=0 to 4 do
+    begin
+    //Boucle permettant à l'hélicoptère d'être animé
+
+	  	sdlheli.x:=sdlheli.x + 128*i;
+      if (sdlheli.x > 512) then sdlheli:=0;
+      sdlheli2.x:=sdlEvent^.motion.x-(128 div 2);
+      sdlheli2.y:=sdlEvent^.motion.y-(55 div 2);
+	  	SDL_RenderCopy(sdlRenderer, sdltext, @sdlheli, @sdlheli2);
+	  	SDL_RenderPresent(sdlRenderer);
+	  	SDL_RenderClear(sdlRenderer);
+	  end;
+	end;
+
+      dispose(sdlEvent);
+  SDL_DestroyTexture(sdltext);
+  SDL_DestroyRenderer(sdlRenderer);
+  SDL_DestroyWindow (sdlWindow1);
+
+  //shutting down video subsystem
+  SDL_Quit;
+
+end.
